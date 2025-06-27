@@ -1,40 +1,18 @@
-import zipfile
-from io import BytesIO
+from django.apps import apps
 
-from django.conf import settings
-from django.http import HttpResponse
-from django.template import loader
-
-# NumPy supported?
-try:
-    import numpy
-except ImportError:
-    numpy = False
+from .requests import RequestSite
 
 
-def compress_kml(kml):
-    "Return compressed KMZ from the given KML string."
-    kmz = BytesIO()
-    with zipfile.ZipFile(kmz, "a", zipfile.ZIP_DEFLATED) as zf:
-        zf.writestr("doc.kml", kml.encode(settings.DEFAULT_CHARSET))
-    kmz.seek(0)
-    return kmz.read()
-
-
-def render_to_kml(*args, **kwargs):
-    "Render the response as KML (using the correct MIME type)."
-    return HttpResponse(
-        loader.render_to_string(*args, **kwargs),
-        content_type="application/vnd.google-earth.kml+xml",
-    )
-
-
-def render_to_kmz(*args, **kwargs):
+def get_current_site(request):
     """
-    Compress the KML content and return as KMZ (using the correct
-    MIME type).
+    Check if contrib.sites is installed and return either the current
+    ``Site`` object or a ``RequestSite`` object based on the request.
     """
-    return HttpResponse(
-        compress_kml(loader.render_to_string(*args, **kwargs)),
-        content_type="application/vnd.google-earth.kmz",
-    )
+    # Import is inside the function because its point is to avoid importing the
+    # Site models when django.contrib.sites isn't installed.
+    if apps.is_installed("django.contrib.sites"):
+        from .models import Site
+
+        return Site.objects.get_current(request)
+    else:
+        return RequestSite(request)

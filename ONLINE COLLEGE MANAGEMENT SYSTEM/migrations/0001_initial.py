@@ -1,4 +1,5 @@
-import django.contrib.sessions.models
+import django.contrib.sites.models
+from django.contrib.sites.models import _simple_domain_name_validator
 from django.db import migrations, models
 
 
@@ -7,31 +8,36 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.CreateModel(
-            name="Session",
+            name="Site",
             fields=[
                 (
-                    "session_key",
-                    models.CharField(
-                        max_length=40,
+                    "id",
+                    models.AutoField(
+                        verbose_name="ID",
                         serialize=False,
-                        verbose_name="session key",
+                        auto_created=True,
                         primary_key=True,
                     ),
                 ),
-                ("session_data", models.TextField(verbose_name="session data")),
                 (
-                    "expire_date",
-                    models.DateTimeField(verbose_name="expire date", db_index=True),
+                    "domain",
+                    models.CharField(
+                        max_length=100,
+                        verbose_name="domain name",
+                        validators=[_simple_domain_name_validator],
+                    ),
                 ),
+                ("name", models.CharField(max_length=50, verbose_name="display name")),
             ],
             options={
-                "abstract": False,
-                "db_table": "django_session",
-                "verbose_name": "session",
-                "verbose_name_plural": "sessions",
+                "ordering": ["domain"],
+                "db_table": "django_site",
+                "verbose_name": "site",
+                "verbose_name_plural": "sites",
             },
+            bases=(models.Model,),
             managers=[
-                ("objects", django.contrib.sessions.models.SessionManager()),
+                ("objects", django.contrib.sites.models.SiteManager()),
             ],
         ),
     ]
