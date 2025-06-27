@@ -1,385 +1,246 @@
-# from __future__ import unicode_literals
-# # AbstractUser is a full User model, complete with fields, as an abstract class so that you can inherit from it and add your own profile fields and methods
-# from django.contrib.auth.models import AbstractUser
-# from django.db import models
-#
-# # Create your models here.
-#
-#
-# class SessionYearModel(models.Model):
-#     id = models.AutoField(primary_key=True)
-#     session_start_year = models.DateField()
-#     session_end_year = models.DateField()
-#     objects = models.Manager()
-#
-#
-# # Overriding the Default Django Auth User and adding One More Field (user_type)
-# class CustomUser(AbstractUser):
-#     user_type_data = (("HOD", "HOD"), ("Staff", "Staff"), ("Student", "Student"))
-#     user_type = models.CharField(default=1, choices=user_type_data, max_length=10)
-#
-#
-# # An AutoField is an IntegerField that automatically increments according to available IDs. One usually won’t need to use this directly because a primary key field will automatically be added to your model if you don’t specify otherwise.
-#
-#
-# # auto_now fields are updated to the current timestamp every time an object is saved and are therefore perfect for tracking when an object was last modified, while an auto_now_add field is saved as the current timestamp when a row is first added
-#
-#
-# # https://docs.djangoproject.com/en/dev/topics/db/managers/
-#
-# class Courses(models.Model):
-#     id = models.AutoField(primary_key=True)
-#     course_name = models.CharField(max_length=255)
-#     created_at = models.DateTimeField(auto_now_add=True)
-#     updated_at = models.DateTimeField(auto_now=True)
-#     objects = models.Manager()
-#
-#
-# # The on_delete method is used to tell Django what to do with model instances that depend on the model instance you delete. (e.g. a ForeignKey relationship). ... CASCADE will instruct Django to cascade the deleting effect i.e. delete all the Book model instances that depend on the Author model instance you deleted
-#
-# # Whenever the referenced object (post) is deleted, the objects referencing it (comments) are deleted as well.
-#
-# class Subjects(models.Model):
-#     id =models.AutoField(primary_key=True)
-#     subject_name = models.CharField(max_length=255)
-#     course_id = models.ForeignKey(Courses, on_delete=models.CASCADE, default=1) #need to give default course
-#     staff_id = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
-#     created_at = models.DateTimeField(auto_now_add=True)
-#     updated_at = models.DateTimeField(auto_now=True)
-#     objects = models.Manager()
-#
-#
-# # it does nothing when a referenced object is deleted.
-#
-# class Students(models.Model):
-#     id = models.AutoField(primary_key=True)
-#     admin = models.OneToOneField(CustomUser, on_delete = models.CASCADE)
-#     gender = models.CharField(max_length=50)
-#     profile_pic = models.FileField()
-#     address = models.TextField()
-#     course_id = models.ForeignKey(Courses, on_delete=models.DO_NOTHING, default=1)
-#     session_year_id = models.ForeignKey(SessionYearModel, on_delete=models.CASCADE)
-#     created_at = models.DateTimeField(auto_now_add=True)
-#     updated_at = models.DateTimeField(auto_now=True)
-#     objects = models.Manager()
-#
-#
-# class Attendance(models.Model):
-#     # Subject Attendance
-#     id = models.AutoField(primary_key=True)
-#     subject_id = models.ForeignKey(Subjects, on_delete=models.DO_NOTHING)
-#     attendance_date = models.DateField()
-#     session_year_id = models.ForeignKey(SessionYearModel, on_delete=models.CASCADE)
-#     created_at = models.DateTimeField(auto_now_add=True)
-#     updated_at = models.DateTimeField(auto_now=True)
-#     objects = models.Manager()
-#
-#
-#
-# class AttendanceReport(models.Model):
-#     # Individual Student Attendance
-#     id = models.AutoField(primary_key=True)
-#     student_id = models.ForeignKey(Students, on_delete=models.DO_NOTHING)
-#     attendance_id = models.ForeignKey(Attendance, on_delete=models.CASCADE)
-#     status = models.BooleanField(default=False)
-#     created_at = models.DateTimeField(auto_now_add=True)
-#     updated_at = models.DateTimeField(auto_now=True)
-#     objects = models.Manager()
-#
-#
-# class LeaveReportStudent(models.Model):
-#     id = models.AutoField(primary_key=True)
-#     student_id = models.ForeignKey(Students, on_delete=models.CASCADE)
-#     leave_date = models.CharField(max_length=255)
-#     leave_message = models.TextField()
-#     leave_status = models.IntegerField(default=0)
-#     created_at = models.DateTimeField(auto_now_add=True)
-#     updated_at = models.DateTimeField(auto_now=True)
-#     objects = models.Manager()
-#
-#
-#
-# class FeedBackStudent(models.Model):
-#     id = models.AutoField(primary_key=True)
-#     student_id = models.ForeignKey(Students, on_delete=models.CASCADE)
-#     feedback = models.TextField()
-#     feedback_reply = models.TextField()
-#     created_at = models.DateTimeField(auto_now_add=True)
-#     updated_at = models.DateTimeField(auto_now=True)
-#     objects = models.Manager()
-#
-# class StudentResult(models.Model):
-#     id = models.AutoField(primary_key=True)
-#     student_id = models.ForeignKey(Students, on_delete=models.CASCADE)
-#     # subject_id = models.ForeignKey(Subjects, on_delete=models.CASCADE)
-#     subject_exam_marks = models.FloatField(default=0)
-#     subject_assignment_marks = models.FloatField(default=0)
-#     created_at = models.DateTimeField(auto_now_add=True)
-#     updated_at = models.DateTimeField(auto_now=True)
-#     objects = models.Manager()
-#
-#
-# class AdminHOD(models.Model):
-#     id = models.AutoField(primary_key=True)
-#     admin = models.OneToOneField(CustomUser, on_delete = models.CASCADE)
-#     created_at = models.DateTimeField(auto_now_add=True)
-#     updated_at = models.DateTimeField(auto_now=True)
-#     objects = models.Manager()
-#
-# class Staffs(models.Model):
-#     id = models.AutoField(primary_key=True)
-#     admin = models.OneToOneField(CustomUser, on_delete = models.CASCADE)
-#     address = models.TextField()
-#     created_at = models.DateTimeField(auto_now_add=True)
-#     updated_at = models.DateTimeField(auto_now=True)
-#     objects = models.Manager()
-#
-#
-# class LeaveReportStaff(models.Model):
-#     id = models.AutoField(primary_key=True)
-#     staff_id = models.ForeignKey(Staffs, on_delete=models.CASCADE)
-#     leave_date = models.CharField(max_length=255)
-#     leave_message = models.TextField()
-#     leave_status = models.IntegerField(default=0)
-#     created_at = models.DateTimeField(auto_now_add=True)
-#     updated_at = models.DateTimeField(auto_now=True)
-#     objects = models.Manager()
-#
-#
-# class FeedBackStaffs(models.Model):
-#     id = models.AutoField(primary_key=True)
-#     staff_id = models.ForeignKey(Staffs, on_delete=models.CASCADE)
-#     feedback = models.TextField()
-#     feedback_reply = models.TextField()
-#     created_at = models.DateTimeField(auto_now_add=True)
-#     updated_at = models.DateTimeField(auto_now=True)
-#     objects = models.Manager()
-#
-#
-#
-# class NotificationStudent(models.Model):
-#     id = models.AutoField(primary_key=True)
-#     student_id = models.ForeignKey(Students, on_delete=models.CASCADE)
-#     message = models.TextField()
-#     created_at = models.DateTimeField(auto_now_add=True)
-#     updated_at = models.DateTimeField(auto_now=True)
-#     objects = models.Manager()
-#
-#
-# class NotificationStaffs(models.Model):
-#     id = models.AutoField(primary_key=True)
-#     stafff_id = models.ForeignKey(Staffs, on_delete=models.CASCADE)
-#     message = models.TextField()
-#     created_at = models.DateTimeField(auto_now_add=True)
-#     updated_at = models.DateTimeField(auto_now=True)
-#     objects = models.Manager()
-#
+import json
+import warnings
 
-from django.contrib.auth.models import AbstractUser
+from django.conf import settings
+from django.contrib.admin.utils import quote
+from django.contrib.contenttypes.models import ContentType
 from django.db import models
-from django.db.models.signals import post_save
-from django.dispatch import receiver
+from django.urls import NoReverseMatch, reverse
+from django.utils import timezone
+from django.utils.deprecation import RemovedInDjango60Warning
+from django.utils.text import get_text_list
+from django.utils.translation import gettext
+from django.utils.translation import gettext_lazy as _
+
+ADDITION = 1
+CHANGE = 2
+DELETION = 3
+
+ACTION_FLAG_CHOICES = [
+    (ADDITION, _("Addition")),
+    (CHANGE, _("Change")),
+    (DELETION, _("Deletion")),
+]
 
 
+class LogEntryManager(models.Manager):
+    use_in_migrations = True
 
-class SessionYearModel(models.Model):
-    id = models.AutoField(primary_key=True)
-    session_start_year = models.DateField()
-    session_end_year = models.DateField()
-    objects = models.Manager()
+    def log_action(
+        self,
+        user_id,
+        content_type_id,
+        object_id,
+        object_repr,
+        action_flag,
+        change_message="",
+    ):
+        warnings.warn(
+            "LogEntryManager.log_action() is deprecated. Use log_actions() instead.",
+            RemovedInDjango60Warning,
+            stacklevel=2,
+        )
+        if isinstance(change_message, list):
+            change_message = json.dumps(change_message)
+        return self.model.objects.create(
+            user_id=user_id,
+            content_type_id=content_type_id,
+            object_id=str(object_id),
+            object_repr=object_repr[:200],
+            action_flag=action_flag,
+            change_message=change_message,
+        )
 
+    def log_actions(
+        self, user_id, queryset, action_flag, change_message="", *, single_object=False
+    ):
+        # RemovedInDjango60Warning.
+        if type(self).log_action != LogEntryManager.log_action:
+            warnings.warn(
+                "The usage of log_action() is deprecated. Implement log_actions() "
+                "instead.",
+                RemovedInDjango60Warning,
+                stacklevel=2,
+            )
+            return [
+                self.log_action(
+                    user_id=user_id,
+                    content_type_id=ContentType.objects.get_for_model(
+                        obj, for_concrete_model=False
+                    ).id,
+                    object_id=obj.pk,
+                    object_repr=str(obj),
+                    action_flag=action_flag,
+                    change_message=change_message,
+                )
+                for obj in queryset
+            ]
 
+        if isinstance(change_message, list):
+            change_message = json.dumps(change_message)
 
-# Overriding the Default Django Auth User and adding One More Field (user_type)
-class CustomUser(AbstractUser):
-    HOD = '1'
-    STAFF = '2'
-    STUDENT = '3'
-    
-    EMAIL_TO_USER_TYPE_MAP = {
-        'hod': HOD,
-        'staff': STAFF,
-        'student': STUDENT
-    }
+        log_entry_list = [
+            self.model(
+                user_id=user_id,
+                content_type_id=ContentType.objects.get_for_model(
+                    obj, for_concrete_model=False
+                ).id,
+                object_id=obj.pk,
+                object_repr=str(obj)[:200],
+                action_flag=action_flag,
+                change_message=change_message,
+            )
+            for obj in queryset
+        ]
 
-    user_type_data = ((HOD, "HOD"), (STAFF, "Staff"), (STUDENT, "Student"))
-    user_type = models.CharField(default=1, choices=user_type_data, max_length=10)
+        if single_object and log_entry_list:
+            instance = log_entry_list[0]
+            instance.save()
+            return instance
 
-
-class AdminHOD(models.Model):
-    id = models.AutoField(primary_key=True)
-    admin = models.OneToOneField(CustomUser, on_delete = models.CASCADE)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-    objects = models.Manager()
-
-
-class Staffs(models.Model):
-    id = models.AutoField(primary_key=True)
-    admin = models.OneToOneField(CustomUser, on_delete = models.CASCADE)
-    address = models.TextField()
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-    objects = models.Manager()
-
-
-
-class Courses(models.Model):
-    id = models.AutoField(primary_key=True)
-    course_name = models.CharField(max_length=255)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-    objects = models.Manager()
-
-    # def __str__(self):
-	#     return self.course_name
-
-
-
-class Subjects(models.Model):
-    id =models.AutoField(primary_key=True)
-    subject_name = models.CharField(max_length=255)
-    course_id = models.ForeignKey(Courses, on_delete=models.CASCADE, default=1) #need to give defauult course
-    staff_id = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-    objects = models.Manager()
-
-
-
-class Students(models.Model):
-    id = models.AutoField(primary_key=True)
-    admin = models.OneToOneField(CustomUser, on_delete = models.CASCADE)
-    gender = models.CharField(max_length=50)
-    profile_pic = models.FileField()
-    address = models.TextField()
-    course_id = models.ForeignKey(Courses, on_delete=models.DO_NOTHING, default=1)
-    session_year_id = models.ForeignKey(SessionYearModel, null=True, on_delete=models.CASCADE)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-    objects = models.Manager()
-
-
-class Attendance(models.Model):
-    # Subject Attendance
-    id = models.AutoField(primary_key=True)
-    subject_id = models.ForeignKey(Subjects, on_delete=models.DO_NOTHING)
-    attendance_date = models.DateField()
-    session_year_id = models.ForeignKey(SessionYearModel, on_delete=models.CASCADE)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-    objects = models.Manager()
+        return self.model.objects.bulk_create(log_entry_list)
 
 
-class AttendanceReport(models.Model):
-    # Individual Student Attendance
-    id = models.AutoField(primary_key=True)
-    student_id = models.ForeignKey(Students, on_delete=models.DO_NOTHING)
-    attendance_id = models.ForeignKey(Attendance, on_delete=models.CASCADE)
-    status = models.BooleanField(default=False)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-    objects = models.Manager()
+class LogEntry(models.Model):
+    action_time = models.DateTimeField(
+        _("action time"),
+        default=timezone.now,
+        editable=False,
+    )
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        models.CASCADE,
+        verbose_name=_("user"),
+    )
+    content_type = models.ForeignKey(
+        ContentType,
+        models.SET_NULL,
+        verbose_name=_("content type"),
+        blank=True,
+        null=True,
+    )
+    object_id = models.TextField(_("object id"), blank=True, null=True)
+    # Translators: 'repr' means representation
+    # (https://docs.python.org/library/functions.html#repr)
+    object_repr = models.CharField(_("object repr"), max_length=200)
+    action_flag = models.PositiveSmallIntegerField(
+        _("action flag"), choices=ACTION_FLAG_CHOICES
+    )
+    # change_message is either a string or a JSON structure
+    change_message = models.TextField(_("change message"), blank=True)
 
+    objects = LogEntryManager()
 
-class LeaveReportStudent(models.Model):
-    id = models.AutoField(primary_key=True)
-    student_id = models.ForeignKey(Students, on_delete=models.CASCADE)
-    leave_date = models.CharField(max_length=255)
-    leave_message = models.TextField()
-    leave_status = models.IntegerField(default=0)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-    objects = models.Manager()
+    class Meta:
+        verbose_name = _("log entry")
+        verbose_name_plural = _("log entries")
+        db_table = "django_admin_log"
+        ordering = ["-action_time"]
 
+    def __repr__(self):
+        return str(self.action_time)
 
-class LeaveReportStaff(models.Model):
-    id = models.AutoField(primary_key=True)
-    staff_id = models.ForeignKey(Staffs, on_delete=models.CASCADE)
-    leave_date = models.CharField(max_length=255)
-    leave_message = models.TextField()
-    leave_status = models.IntegerField(default=0)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-    objects = models.Manager()
+    def __str__(self):
+        if self.is_addition():
+            return gettext("Added “%(object)s”.") % {"object": self.object_repr}
+        elif self.is_change():
+            return gettext("Changed “%(object)s” — %(changes)s") % {
+                "object": self.object_repr,
+                "changes": self.get_change_message(),
+            }
+        elif self.is_deletion():
+            return gettext("Deleted “%(object)s.”") % {"object": self.object_repr}
 
+        return gettext("LogEntry Object")
 
-class FeedBackStudent(models.Model):
-    id = models.AutoField(primary_key=True)
-    student_id = models.ForeignKey(Students, on_delete=models.CASCADE)
-    feedback = models.TextField()
-    feedback_reply = models.TextField()
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-    objects = models.Manager()
+    def is_addition(self):
+        return self.action_flag == ADDITION
 
+    def is_change(self):
+        return self.action_flag == CHANGE
 
-class FeedBackStaffs(models.Model):
-    id = models.AutoField(primary_key=True)
-    staff_id = models.ForeignKey(Staffs, on_delete=models.CASCADE)
-    feedback = models.TextField()
-    feedback_reply = models.TextField()
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-    objects = models.Manager()
+    def is_deletion(self):
+        return self.action_flag == DELETION
 
+    def get_change_message(self):
+        """
+        If self.change_message is a JSON structure, interpret it as a change
+        string, properly translated.
+        """
+        if self.change_message and self.change_message[0] == "[":
+            try:
+                change_message = json.loads(self.change_message)
+            except json.JSONDecodeError:
+                return self.change_message
+            messages = []
+            for sub_message in change_message:
+                if "added" in sub_message:
+                    if sub_message["added"]:
+                        sub_message["added"]["name"] = gettext(
+                            sub_message["added"]["name"]
+                        )
+                        messages.append(
+                            gettext("Added {name} “{object}”.").format(
+                                **sub_message["added"]
+                            )
+                        )
+                    else:
+                        messages.append(gettext("Added."))
 
+                elif "changed" in sub_message:
+                    sub_message["changed"]["fields"] = get_text_list(
+                        [
+                            gettext(field_name)
+                            for field_name in sub_message["changed"]["fields"]
+                        ],
+                        gettext("and"),
+                    )
+                    if "name" in sub_message["changed"]:
+                        sub_message["changed"]["name"] = gettext(
+                            sub_message["changed"]["name"]
+                        )
+                        messages.append(
+                            gettext("Changed {fields} for {name} “{object}”.").format(
+                                **sub_message["changed"]
+                            )
+                        )
+                    else:
+                        messages.append(
+                            gettext("Changed {fields}.").format(
+                                **sub_message["changed"]
+                            )
+                        )
 
-class NotificationStudent(models.Model):
-    id = models.AutoField(primary_key=True)
-    student_id = models.ForeignKey(Students, on_delete=models.CASCADE)
-    message = models.TextField()
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-    objects = models.Manager()
+                elif "deleted" in sub_message:
+                    sub_message["deleted"]["name"] = gettext(
+                        sub_message["deleted"]["name"]
+                    )
+                    messages.append(
+                        gettext("Deleted {name} “{object}”.").format(
+                            **sub_message["deleted"]
+                        )
+                    )
 
+            change_message = " ".join(msg[0].upper() + msg[1:] for msg in messages)
+            return change_message or gettext("No fields changed.")
+        else:
+            return self.change_message
 
-class NotificationStaffs(models.Model):
-    id = models.AutoField(primary_key=True)
-    stafff_id = models.ForeignKey(Staffs, on_delete=models.CASCADE)
-    message = models.TextField()
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-    objects = models.Manager()
+    def get_edited_object(self):
+        """Return the edited object represented by this log entry."""
+        return self.content_type.get_object_for_this_type(pk=self.object_id)
 
-
-class StudentResult(models.Model):
-    id = models.AutoField(primary_key=True)
-    student_id = models.ForeignKey(Students, on_delete=models.CASCADE)
-    subject_id = models.ForeignKey(Subjects, on_delete=models.CASCADE, default=1)
-    subject_exam_marks = models.FloatField(default=0)
-    subject_assignment_marks = models.FloatField(default=0)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-    objects = models.Manager()
-
-
-#Creating Django Signals
-
-# It's like trigger in database. It will run only when Data is Added in CustomUser model
-
-@receiver(post_save, sender=CustomUser)
-# Now Creating a Function which will automatically insert data in HOD, Staff or Student
-def create_user_profile(sender, instance, created, **kwargs):
-    # if Created is true (Means Data Inserted)
-    if created:
-        # Check the user_type and insert the data in respective tables
-        if instance.user_type == 1:
-            AdminHOD.objects.create(admin=instance)
-        if instance.user_type == 2:
-            Staffs.objects.create(admin=instance)
-        if instance.user_type == 3:
-            Students.objects.create(admin=instance, course_id=Courses.objects.get(id=1), session_year_id=SessionYearModel.objects.get(id=1), address="", profile_pic="", gender="")
-    
-
-@receiver(post_save, sender=CustomUser)
-def save_user_profile(sender, instance, **kwargs):
-    if instance.user_type == 1:
-        instance.adminhod.save()
-    if instance.user_type == 2:
-        instance.staffs.save()
-    if instance.user_type == 3:
-        instance.students.save()
-    
-
-
+    def get_admin_url(self):
+        """
+        Return the admin URL to edit the object represented by this log entry.
+        """
+        if self.content_type and self.object_id:
+            url_name = "admin:%s_%s_change" % (
+                self.content_type.app_label,
+                self.content_type.model,
+            )
+            try:
+                return reverse(url_name, args=(quote(self.object_id),))
+            except NoReverseMatch:
+                pass
+        return None

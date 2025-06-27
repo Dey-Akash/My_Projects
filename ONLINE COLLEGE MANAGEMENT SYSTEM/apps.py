@@ -1,6 +1,7 @@
 from django.apps import AppConfig
+from django.utils.translation import gettext_lazy as _
 
 
-class StudentManagementAppConfig(AppConfig):
-    default_auto_field = 'django.db.models.BigAutoField'
-    name = 'student_management_app'
+class AdminDocsConfig(AppConfig):
+    name = "django.contrib.admindocs"
+    verbose_name = _("Administrative Documentation")

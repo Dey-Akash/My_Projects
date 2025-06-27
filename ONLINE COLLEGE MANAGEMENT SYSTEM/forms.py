@@ -1,92 +1,31 @@
-from django import forms
-from .models import Courses, SessionYearModel
+from django.contrib.auth.forms import AuthenticationForm, PasswordChangeForm
+from django.core.exceptions import ValidationError
+from django.utils.translation import gettext_lazy as _
 
 
-class DateInput(forms.DateInput):
-    input_type = "date"
+class AdminAuthenticationForm(AuthenticationForm):
+    """
+    A custom authentication form used in the admin app.
+    """
+
+    error_messages = {
+        **AuthenticationForm.error_messages,
+        "invalid_login": _(
+            "Please enter the correct %(username)s and password for a staff "
+            "account. Note that both fields may be case-sensitive."
+        ),
+    }
+    required_css_class = "required"
+
+    def confirm_login_allowed(self, user):
+        super().confirm_login_allowed(user)
+        if not user.is_staff:
+            raise ValidationError(
+                self.error_messages["invalid_login"],
+                code="invalid_login",
+                params={"username": self.username_field.verbose_name},
+            )
 
 
-class AddStudentForm(forms.Form):
-    email = forms.EmailField(label="Email", max_length=50, widget=forms.EmailInput(attrs={"class":"form-control"}))
-    password = forms.CharField(label="Password", max_length=50, widget=forms.PasswordInput(attrs={"class":"form-control"}))
-    first_name = forms.CharField(label="First Name", max_length=50, widget=forms.TextInput(attrs={"class":"form-control"}))
-    last_name = forms.CharField(label="Last Name", max_length=50, widget=forms.TextInput(attrs={"class":"form-control"}))
-    username = forms.CharField(label="Username", max_length=50, widget=forms.TextInput(attrs={"class":"form-control"}))
-    address = forms.CharField(label="Address", max_length=50, widget=forms.TextInput(attrs={"class":"form-control"}))
-
-    #For Displaying Courses
-    try:
-        courses = Courses.objects.all()
-        course_list = []
-        for course in courses:
-            single_course = (course.id, course.course_name)
-            course_list.append(single_course)
-    except:
-        print("here")
-        course_list = []
-    
-    #For Displaying Session Years
-    try:
-        session_years = SessionYearModel.objects.all()
-        session_year_list = []
-        for session_year in session_years:
-            single_session_year = (session_year.id, str(session_year.session_start_year)+" to "+str(session_year.session_end_year))
-            session_year_list.append(single_session_year)
-            
-    except:
-        session_year_list = []
-    
-    gender_list = (
-        ('Male','Male'),
-        ('Female','Female')
-    )
-    
-    course_id = forms.ChoiceField(label="Course", choices=course_list, widget=forms.Select(attrs={"class":"form-control"}))
-    gender = forms.ChoiceField(label="Gender", choices=gender_list, widget=forms.Select(attrs={"class":"form-control"}))
-    session_year_id = forms.ChoiceField(label="Session Year", choices=session_year_list, widget=forms.Select(attrs={"class":"form-control"}))
-    # session_start_year = forms.DateField(label="Session Start", widget=DateInput(attrs={"class":"form-control"}))
-    # session_end_year = forms.DateField(label="Session End", widget=DateInput(attrs={"class":"form-control"}))
-    profile_pic = forms.FileField(label="Profile Pic", required=False, widget=forms.FileInput(attrs={"class":"form-control"}))
-
-
-
-class EditStudentForm(forms.Form):
-    email = forms.EmailField(label="Email", max_length=50, widget=forms.EmailInput(attrs={"class":"form-control"}))
-    first_name = forms.CharField(label="First Name", max_length=50, widget=forms.TextInput(attrs={"class":"form-control"}))
-    last_name = forms.CharField(label="Last Name", max_length=50, widget=forms.TextInput(attrs={"class":"form-control"}))
-    username = forms.CharField(label="Username", max_length=50, widget=forms.TextInput(attrs={"class":"form-control"}))
-    address = forms.CharField(label="Address", max_length=50, widget=forms.TextInput(attrs={"class":"form-control"}))
-
-    #For Displaying Courses
-    try:
-        courses = Courses.objects.all()
-        course_list = []
-        for course in courses:
-            single_course = (course.id, course.course_name)
-            course_list.append(single_course)
-    except:
-        course_list = []
-
-    #For Displaying Session Years
-    try:
-        session_years = SessionYearModel.objects.all()
-        session_year_list = []
-        for session_year in session_years:
-            single_session_year = (session_year.id, str(session_year.session_start_year)+" to "+str(session_year.session_end_year))
-            session_year_list.append(single_session_year)
-            
-    except:
-        session_year_list = []
-
-    
-    gender_list = (
-        ('Male','Male'),
-        ('Female','Female')
-    )
-    
-    course_id = forms.ChoiceField(label="Course", choices=course_list, widget=forms.Select(attrs={"class":"form-control"}))
-    gender = forms.ChoiceField(label="Gender", choices=gender_list, widget=forms.Select(attrs={"class":"form-control"}))
-    session_year_id = forms.ChoiceField(label="Session Year", choices=session_year_list, widget=forms.Select(attrs={"class":"form-control"}))
-    # session_start_year = forms.DateField(label="Session Start", widget=DateInput(attrs={"class":"form-control"}))
-    # session_end_year = forms.DateField(label="Session End", widget=DateInput(attrs={"class":"form-control"}))
-    profile_pic = forms.FileField(label="Profile Pic", required=False, widget=forms.FileInput(attrs={"class":"form-control"}))
+class AdminPasswordChangeForm(PasswordChangeForm):
+    required_css_class = "required"
