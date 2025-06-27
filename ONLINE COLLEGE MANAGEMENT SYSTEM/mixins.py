@@ -1,135 +1,95 @@
-from urllib.parse import urlparse
+"""
+Basic building blocks for generic class based views.
 
-from django.conf import settings
-from django.contrib.auth import REDIRECT_FIELD_NAME
-from django.contrib.auth.views import redirect_to_login
-from django.core.exceptions import ImproperlyConfigured, PermissionDenied
-from django.shortcuts import resolve_url
+We don't bind behaviour to http method handlers yet,
+which allows mixin classes to be composed in interesting ways.
+"""
+from rest_framework import status
+from rest_framework.response import Response
+from rest_framework.settings import api_settings
 
 
-class AccessMixin:
+class CreateModelMixin:
     """
-    Abstract CBV mixin that gives access mixins the same customizable
-    functionality.
+    Create a model instance.
     """
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)
+        headers = self.get_success_headers(serializer.data)
+        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
 
-    login_url = None
-    permission_denied_message = ""
-    raise_exception = False
-    redirect_field_name = REDIRECT_FIELD_NAME
+    def perform_create(self, serializer):
+        serializer.save()
 
-    def get_login_url(self):
-        """
-        Override this method to override the login_url attribute.
-        """
-        login_url = self.login_url or settings.LOGIN_URL
-        if not login_url:
-            raise ImproperlyConfigured(
-                f"{self.__class__.__name__} is missing the login_url attribute. Define "
-                f"{self.__class__.__name__}.login_url, settings.LOGIN_URL, or override "
-                f"{self.__class__.__name__}.get_login_url()."
-            )
-        return str(login_url)
-
-    def get_permission_denied_message(self):
-        """
-        Override this method to override the permission_denied_message attribute.
-        """
-        return self.permission_denied_message
-
-    def get_redirect_field_name(self):
-        """
-        Override this method to override the redirect_field_name attribute.
-        """
-        return self.redirect_field_name
-
-    def handle_no_permission(self):
-        if self.raise_exception or self.request.user.is_authenticated:
-            raise PermissionDenied(self.get_permission_denied_message())
-
-        path = self.request.build_absolute_uri()
-        resolved_login_url = resolve_url(self.get_login_url())
-        # If the login url is the same scheme and net location then use the
-        # path as the "next" url.
-        login_scheme, login_netloc = urlparse(resolved_login_url)[:2]
-        current_scheme, current_netloc = urlparse(path)[:2]
-        if (not login_scheme or login_scheme == current_scheme) and (
-            not login_netloc or login_netloc == current_netloc
-        ):
-            path = self.request.get_full_path()
-        return redirect_to_login(
-            path,
-            resolved_login_url,
-            self.get_redirect_field_name(),
-        )
+    def get_success_headers(self, data):
+        try:
+            return {'Location': str(data[api_settings.URL_FIELD_NAME])}
+        except (TypeError, KeyError):
+            return {}
 
 
-class LoginRequiredMixin(AccessMixin):
-    """Verify that the current user is authenticated."""
-
-    def dispatch(self, request, *args, **kwargs):
-        if not request.user.is_authenticated:
-            return self.handle_no_permission()
-        return super().dispatch(request, *args, **kwargs)
-
-
-class PermissionRequiredMixin(AccessMixin):
-    """Verify that the current user has all specified permissions."""
-
-    permission_required = None
-
-    def get_permission_required(self):
-        """
-        Override this method to override the permission_required attribute.
-        Must return an iterable.
-        """
-        if self.permission_required is None:
-            raise ImproperlyConfigured(
-                f"{self.__class__.__name__} is missing the "
-                f"permission_required attribute. Define "
-                f"{self.__class__.__name__}.permission_required, or override "
-                f"{self.__class__.__name__}.get_permission_required()."
-            )
-        if isinstance(self.permission_required, str):
-            perms = (self.permission_required,)
-        else:
-            perms = self.permission_required
-        return perms
-
-    def has_permission(self):
-        """
-        Override this method to customize the way permissions are checked.
-        """
-        perms = self.get_permission_required()
-        return self.request.user.has_perms(perms)
-
-    def dispatch(self, request, *args, **kwargs):
-        if not self.has_permission():
-            return self.handle_no_permission()
-        return super().dispatch(request, *args, **kwargs)
-
-
-class UserPassesTestMixin(AccessMixin):
+class ListModelMixin:
     """
-    Deny a request with a permission error if the test_func() method returns
-    False.
+    List a queryset.
     """
+    def list(self, request, *args, **kwargs):
+        queryset = self.filter_queryset(self.get_queryset())
 
-    def test_func(self):
-        raise NotImplementedError(
-            "{} is missing the implementation of the test_func() method.".format(
-                self.__class__.__name__
-            )
-        )
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
 
-    def get_test_func(self):
-        """
-        Override this method to use a different test_func method.
-        """
-        return self.test_func
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
 
-    def dispatch(self, request, *args, **kwargs):
-        user_test_result = self.get_test_func()()
-        if not user_test_result:
-            return self.handle_no_permission()
-        return super().dispatch(request, *args, **kwargs)
+
+class RetrieveModelMixin:
+    """
+    Retrieve a model instance.
+    """
+    def retrieve(self, request, *args, **kwargs):
+        instance = self.get_object()
+        serializer = self.get_serializer(instance)
+        return Response(serializer.data)
+
+
+class UpdateModelMixin:
+    """
+    Update a model instance.
+    """
+    def update(self, request, *args, **kwargs):
+        partial = kwargs.pop('partial', False)
+        instance = self.get_object()
+        serializer = self.get_serializer(instance, data=request.data, partial=partial)
+        serializer.is_valid(raise_exception=True)
+        self.perform_update(serializer)
+
+        if getattr(instance, '_prefetched_objects_cache', None):
+            # If 'prefetch_related' has been applied to a queryset, we need to
+            # forcibly invalidate the prefetch cache on the instance.
+            instance._prefetched_objects_cache = {}
+
+        return Response(serializer.data)
+
+    def perform_update(self, serializer):
+        serializer.save()
+
+    def partial_update(self, request, *args, **kwargs):
+        kwargs['partial'] = True
+        return self.update(request, *args, **kwargs)
+
+
+class DestroyModelMixin:
+    """
+    Destroy a model instance.
+    """
+    def destroy(self, request, *args, **kwargs):
+        instance = self.get_object()
+        self.perform_destroy(instance)
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+    def perform_destroy(self, instance):
+        instance.delete()

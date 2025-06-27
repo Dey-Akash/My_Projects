@@ -1,136 +1,233 @@
-import asyncio
-from functools import wraps
-from urllib.parse import urlparse
+"""
+The most important decorator in this module is `@api_view`, which is used
+for writing function-based views with REST framework.
 
-from asgiref.sync import async_to_sync, sync_to_async
+There are also various decorators for setting the API policies on function
+based views, as well as the `@action` decorator, which is used to annotate
+methods on viewsets that should be included by routers.
+"""
+import types
 
-from django.conf import settings
-from django.contrib.auth import REDIRECT_FIELD_NAME
-from django.core.exceptions import PermissionDenied
-from django.shortcuts import resolve_url
+from django.forms.utils import pretty_name
+
+from rest_framework.views import APIView
 
 
-def user_passes_test(
-    test_func, login_url=None, redirect_field_name=REDIRECT_FIELD_NAME
-):
+def api_view(http_method_names=None):
     """
-    Decorator for views that checks that the user passes the given test,
-    redirecting to the log-in page if necessary. The test should be a callable
-    that takes the user object and returns True if the user passes.
+    Decorator that converts a function-based view into an APIView subclass.
+    Takes a list of allowed methods for the view as an argument.
     """
+    http_method_names = ['GET'] if (http_method_names is None) else http_method_names
 
-    def decorator(view_func):
-        def _redirect_to_login(request):
-            path = request.build_absolute_uri()
-            resolved_login_url = resolve_url(login_url or settings.LOGIN_URL)
-            # If the login url is the same scheme and net location then just
-            # use the path as the "next" url.
-            login_scheme, login_netloc = urlparse(resolved_login_url)[:2]
-            current_scheme, current_netloc = urlparse(path)[:2]
-            if (not login_scheme or login_scheme == current_scheme) and (
-                not login_netloc or login_netloc == current_netloc
-            ):
-                path = request.get_full_path()
-            from django.contrib.auth.views import redirect_to_login
+    def decorator(func):
 
-            return redirect_to_login(path, resolved_login_url, redirect_field_name)
+        WrappedAPIView = type(
+            'WrappedAPIView',
+            (APIView,),
+            {'__doc__': func.__doc__}
+        )
 
-        if asyncio.iscoroutinefunction(view_func):
+        # Note, the above allows us to set the docstring.
+        # It is the equivalent of:
+        #
+        #     class WrappedAPIView(APIView):
+        #         pass
+        #     WrappedAPIView.__doc__ = func.doc    <--- Not possible to do this
 
-            async def _view_wrapper(request, *args, **kwargs):
-                auser = await request.auser()
-                if asyncio.iscoroutinefunction(test_func):
-                    test_pass = await test_func(auser)
-                else:
-                    test_pass = await sync_to_async(test_func)(auser)
+        # api_view applied without (method_names)
+        assert not isinstance(http_method_names, types.FunctionType), \
+            '@api_view missing list of allowed HTTP methods'
 
-                if test_pass:
-                    return await view_func(request, *args, **kwargs)
-                return _redirect_to_login(request)
+        # api_view applied with eg. string instead of list of strings
+        assert isinstance(http_method_names, (list, tuple)), \
+            '@api_view expected a list of strings, received %s' % type(http_method_names).__name__
 
-        else:
+        allowed_methods = set(http_method_names) | {'options'}
+        WrappedAPIView.http_method_names = [method.lower() for method in allowed_methods]
 
-            def _view_wrapper(request, *args, **kwargs):
-                if asyncio.iscoroutinefunction(test_func):
-                    test_pass = async_to_sync(test_func)(request.user)
-                else:
-                    test_pass = test_func(request.user)
+        def handler(self, *args, **kwargs):
+            return func(*args, **kwargs)
 
-                if test_pass:
-                    return view_func(request, *args, **kwargs)
-                return _redirect_to_login(request)
+        for method in http_method_names:
+            setattr(WrappedAPIView, method.lower(), handler)
 
-        # Attributes used by LoginRequiredMiddleware.
-        _view_wrapper.login_url = login_url
-        _view_wrapper.redirect_field_name = redirect_field_name
+        WrappedAPIView.__name__ = func.__name__
+        WrappedAPIView.__module__ = func.__module__
 
-        return wraps(view_func)(_view_wrapper)
+        WrappedAPIView.renderer_classes = getattr(func, 'renderer_classes',
+                                                  APIView.renderer_classes)
+
+        WrappedAPIView.parser_classes = getattr(func, 'parser_classes',
+                                                APIView.parser_classes)
+
+        WrappedAPIView.authentication_classes = getattr(func, 'authentication_classes',
+                                                        APIView.authentication_classes)
+
+        WrappedAPIView.throttle_classes = getattr(func, 'throttle_classes',
+                                                  APIView.throttle_classes)
+
+        WrappedAPIView.permission_classes = getattr(func, 'permission_classes',
+                                                    APIView.permission_classes)
+
+        WrappedAPIView.schema = getattr(func, 'schema',
+                                        APIView.schema)
+
+        return WrappedAPIView.as_view()
 
     return decorator
 
 
-def login_required(
-    function=None, redirect_field_name=REDIRECT_FIELD_NAME, login_url=None
-):
+def renderer_classes(renderer_classes):
+    def decorator(func):
+        func.renderer_classes = renderer_classes
+        return func
+    return decorator
+
+
+def parser_classes(parser_classes):
+    def decorator(func):
+        func.parser_classes = parser_classes
+        return func
+    return decorator
+
+
+def authentication_classes(authentication_classes):
+    def decorator(func):
+        func.authentication_classes = authentication_classes
+        return func
+    return decorator
+
+
+def throttle_classes(throttle_classes):
+    def decorator(func):
+        func.throttle_classes = throttle_classes
+        return func
+    return decorator
+
+
+def permission_classes(permission_classes):
+    def decorator(func):
+        func.permission_classes = permission_classes
+        return func
+    return decorator
+
+
+def schema(view_inspector):
+    def decorator(func):
+        func.schema = view_inspector
+        return func
+    return decorator
+
+
+def action(methods=None, detail=None, url_path=None, url_name=None, **kwargs):
     """
-    Decorator for views that checks that the user is logged in, redirecting
-    to the log-in page if necessary.
+    Mark a ViewSet method as a routable action.
+
+    `@action`-decorated functions will be endowed with a `mapping` property,
+    a `MethodMapper` that can be used to add additional method-based behaviors
+    on the routed action.
+
+    :param methods: A list of HTTP method names this action responds to.
+                    Defaults to GET only.
+    :param detail: Required. Determines whether this action applies to
+                   instance/detail requests or collection/list requests.
+    :param url_path: Define the URL segment for this action. Defaults to the
+                     name of the method decorated.
+    :param url_name: Define the internal (`reverse`) URL name for this action.
+                     Defaults to the name of the method decorated with underscores
+                     replaced with dashes.
+    :param kwargs: Additional properties to set on the view.  This can be used
+                   to override viewset-level *_classes settings, equivalent to
+                   how the `@renderer_classes` etc. decorators work for function-
+                   based API views.
     """
-    actual_decorator = user_passes_test(
-        lambda u: u.is_authenticated,
-        login_url=login_url,
-        redirect_field_name=redirect_field_name,
+    methods = ['get'] if methods is None else methods
+    methods = [method.lower() for method in methods]
+
+    assert detail is not None, (
+        "@action() missing required argument: 'detail'"
     )
-    if function:
-        return actual_decorator(function)
-    return actual_decorator
 
+    # name and suffix are mutually exclusive
+    if 'name' in kwargs and 'suffix' in kwargs:
+        raise TypeError("`name` and `suffix` are mutually exclusive arguments.")
 
-def login_not_required(view_func):
-    """
-    Decorator for views that allows access to unauthenticated requests.
-    """
-    view_func.login_required = False
-    return view_func
+    def decorator(func):
+        func.mapping = MethodMapper(func, methods)
 
+        func.detail = detail
+        func.url_path = url_path if url_path else func.__name__
+        func.url_name = url_name if url_name else func.__name__.replace('_', '-')
 
-def permission_required(perm, login_url=None, raise_exception=False):
-    """
-    Decorator for views that checks whether a user has a particular permission
-    enabled, redirecting to the log-in page if necessary.
-    If the raise_exception parameter is given the PermissionDenied exception
-    is raised.
-    """
-    if isinstance(perm, str):
-        perms = (perm,)
-    else:
-        perms = perm
+        # These kwargs will end up being passed to `ViewSet.as_view()` within
+        # the router, which eventually delegates to Django's CBV `View`,
+        # which assigns them as instance attributes for each request.
+        func.kwargs = kwargs
 
-    def decorator(view_func):
-        if asyncio.iscoroutinefunction(view_func):
+        # Set descriptive arguments for viewsets
+        if 'name' not in kwargs and 'suffix' not in kwargs:
+            func.kwargs['name'] = pretty_name(func.__name__)
+        func.kwargs['description'] = func.__doc__ or None
 
-            async def check_perms(user):
-                # First check if the user has the permission (even anon users).
-                if await sync_to_async(user.has_perms)(perms):
-                    return True
-                # In case the 403 handler should be called raise the exception.
-                if raise_exception:
-                    raise PermissionDenied
-                # As the last resort, show the login form.
-                return False
-
-        else:
-
-            def check_perms(user):
-                # First check if the user has the permission (even anon users).
-                if user.has_perms(perms):
-                    return True
-                # In case the 403 handler should be called raise the exception.
-                if raise_exception:
-                    raise PermissionDenied
-                # As the last resort, show the login form.
-                return False
-
-        return user_passes_test(check_perms, login_url=login_url)(view_func)
-
+        return func
     return decorator
+
+
+class MethodMapper(dict):
+    """
+    Enables mapping HTTP methods to different ViewSet methods for a single,
+    logical action.
+
+    Example usage:
+
+        class MyViewSet(ViewSet):
+
+            @action(detail=False)
+            def example(self, request, **kwargs):
+                ...
+
+            @example.mapping.post
+            def create_example(self, request, **kwargs):
+                ...
+    """
+
+    def __init__(self, action, methods):
+        self.action = action
+        for method in methods:
+            self[method] = self.action.__name__
+
+    def _map(self, method, func):
+        assert method not in self, (
+            "Method '%s' has already been mapped to '.%s'." % (method, self[method]))
+        assert func.__name__ != self.action.__name__, (
+            "Method mapping does not behave like the property decorator. You "
+            "cannot use the same method name for each mapping declaration.")
+
+        self[method] = func.__name__
+
+        return func
+
+    def get(self, func):
+        return self._map('get', func)
+
+    def post(self, func):
+        return self._map('post', func)
+
+    def put(self, func):
+        return self._map('put', func)
+
+    def patch(self, func):
+        return self._map('patch', func)
+
+    def delete(self, func):
+        return self._map('delete', func)
+
+    def head(self, func):
+        return self._map('head', func)
+
+    def options(self, func):
+        return self._map('options', func)
+
+    def trace(self, func):
+        return self._map('trace', func)
