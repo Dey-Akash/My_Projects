@@ -1,55 +1,27 @@
-import os
-import string
-import urllib.parse
-import urllib.request
+from urllib import parse
 
-from .compat import WINDOWS
+from django.utils.encoding import force_str
 
 
-def path_to_url(path: str) -> str:
+def replace_query_param(url, key, val):
     """
-    Convert a path to a file: URL.  The path will be made absolute and have
-    quoted path parts.
+    Given a URL and a key/val pair, set or replace an item in the query
+    parameters of the URL, and return the new URL.
     """
-    path = os.path.normpath(os.path.abspath(path))
-    url = urllib.parse.urljoin("file:", urllib.request.pathname2url(path))
-    return url
+    (scheme, netloc, path, query, fragment) = parse.urlsplit(force_str(url))
+    query_dict = parse.parse_qs(query, keep_blank_values=True)
+    query_dict[force_str(key)] = [force_str(val)]
+    query = parse.urlencode(sorted(query_dict.items()), doseq=True)
+    return parse.urlunsplit((scheme, netloc, path, query, fragment))
 
 
-def url_to_path(url: str) -> str:
+def remove_query_param(url, key):
     """
-    Convert a file: URL to a path.
+    Given a URL and a key/val pair, remove an item in the query
+    parameters of the URL, and return the new URL.
     """
-    assert url.startswith(
-        "file:"
-    ), f"You can only turn file: urls into filenames (not {url!r})"
-
-    _, netloc, path, _, _ = urllib.parse.urlsplit(url)
-
-    if not netloc or netloc == "localhost":
-        # According to RFC 8089, same as empty authority.
-        netloc = ""
-    elif WINDOWS:
-        # If we have a UNC path, prepend UNC share notation.
-        netloc = "\\\\" + netloc
-    else:
-        raise ValueError(
-            f"non-local file URIs are not supported on this platform: {url!r}"
-        )
-
-    path = urllib.request.url2pathname(netloc + path)
-
-    # On Windows, urlsplit parses the path as something like "/C:/Users/foo".
-    # This creates issues for path-related functions like io.open(), so we try
-    # to detect and strip the leading slash.
-    if (
-        WINDOWS
-        and not netloc  # Not UNC.
-        and len(path) >= 3
-        and path[0] == "/"  # Leading slash to strip.
-        and path[1] in string.ascii_letters  # Drive letter.
-        and path[2:4] in (":", ":/")  # Colon + end of string, or colon + absolute path.
-    ):
-        path = path[1:]
-
-    return path
+    (scheme, netloc, path, query, fragment) = parse.urlsplit(force_str(url))
+    query_dict = parse.parse_qs(query, keep_blank_values=True)
+    query_dict.pop(key, None)
+    query = parse.urlencode(sorted(query_dict.items()), doseq=True)
+    return parse.urlunsplit((scheme, netloc, path, query, fragment))
