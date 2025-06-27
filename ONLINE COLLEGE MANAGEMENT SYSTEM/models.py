@@ -1,49 +1,35 @@
-from django.contrib.sites.models import Site
-from django.db import models
-from django.urls import NoReverseMatch, get_script_prefix, reverse
-from django.utils.encoding import iri_to_uri
-from django.utils.translation import gettext_lazy as _
+from django.contrib.sessions.base_session import AbstractBaseSession, BaseSessionManager
 
 
-class FlatPage(models.Model):
-    url = models.CharField(_("URL"), max_length=100, db_index=True)
-    title = models.CharField(_("title"), max_length=200)
-    content = models.TextField(_("content"), blank=True)
-    enable_comments = models.BooleanField(_("enable comments"), default=False)
-    template_name = models.CharField(
-        _("template name"),
-        max_length=70,
-        blank=True,
-        help_text=_(
-            "Example: “flatpages/contact_page.html”. If this isn’t provided, "
-            "the system will use “flatpages/default.html”."
-        ),
-    )
-    registration_required = models.BooleanField(
-        _("registration required"),
-        help_text=_(
-            "If this is checked, only logged-in users will be able to view the page."
-        ),
-        default=False,
-    )
-    sites = models.ManyToManyField(Site, verbose_name=_("sites"))
+class SessionManager(BaseSessionManager):
+    use_in_migrations = True
 
-    class Meta:
-        db_table = "django_flatpage"
-        verbose_name = _("flat page")
-        verbose_name_plural = _("flat pages")
-        ordering = ["url"]
 
-    def __str__(self):
-        return "%s -- %s" % (self.url, self.title)
+class Session(AbstractBaseSession):
+    """
+    Django provides full support for anonymous sessions. The session
+    framework lets you store and retrieve arbitrary data on a
+    per-site-visitor basis. It stores data on the server side and
+    abstracts the sending and receiving of cookies. Cookies contain a
+    session ID -- not the data itself.
 
-    def get_absolute_url(self):
-        from .views import flatpage
+    The Django sessions framework is entirely cookie-based. It does
+    not fall back to putting session IDs in URLs. This is an intentional
+    design decision. Not only does that behavior make URLs ugly, it makes
+    your site vulnerable to session-ID theft via the "Referer" header.
 
-        for url in (self.url.lstrip("/"), self.url):
-            try:
-                return reverse(flatpage, kwargs={"url": url})
-            except NoReverseMatch:
-                pass
-        # Handle script prefix manually because we bypass reverse()
-        return iri_to_uri(get_script_prefix().rstrip("/") + self.url)
+    For complete documentation on using Sessions in your code, consult
+    the sessions documentation that is shipped with Django (also available
+    on the Django web site).
+    """
+
+    objects = SessionManager()
+
+    @classmethod
+    def get_session_store_class(cls):
+        from django.contrib.sessions.backends.db import SessionStore
+
+        return SessionStore
+
+    class Meta(AbstractBaseSession.Meta):
+        db_table = "django_session"
