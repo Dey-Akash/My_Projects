@@ -113,44 +113,13 @@ sfdx force:apex:test:run -u <ORG_ALIAS> --resultformat human --wait 10
 
 The `Screenshot/` folder contains sample UI and workflow images for the Airline Management app.
 
-### Example screenshots
+### View sample screenshots
 
-![Screenshot 1](Screenshot/Screenshot%202026-05-24%20224543.png)
+![Airline management screenshot 1](Screenshot/Screenshot%202026-05-24%20224543.png)
 
-![Screenshot 2](Screenshot/Screenshot%202026-05-24%20225110.png)
+![Airline management screenshot 2](Screenshot/Screenshot%202026-05-24%20225110.png)
 
-![Screenshot 3](Screenshot/Screenshot%202026-05-24%20225122.png)
-
-### Full screenshot list
-
-- `Screenshot/Screenshot 2026-05-24 224543.png`
-- `Screenshot/Screenshot 2026-05-24 225110.png`
-- `Screenshot/Screenshot 2026-05-24 225122.png`
-- `Screenshot/Screenshot 2026-05-24 225134.png`
-- `Screenshot/Screenshot 2026-05-24 225146.png`
-- `Screenshot/Screenshot 2026-05-24 225203.png`
-- `Screenshot/Screenshot 2026-05-24 225219.png`
-- `Screenshot/Screenshot 2026-05-24 225229.png`
-- `Screenshot/Screenshot 2026-05-24 225239.png`
-- `Screenshot/Screenshot 2026-05-24 225253.png`
-- `Screenshot/Screenshot 2026-05-24 225304.png`
-- `Screenshot/Screenshot 2026-05-24 225315.png`
-- `Screenshot/Screenshot 2026-05-24 225326.png`
-- `Screenshot/Screenshot 2026-05-24 225337.png`
-- `Screenshot/Screenshot 2026-05-24 225348.png`
-- `Screenshot/Screenshot 2026-05-24 225359.png`
-- `Screenshot/Screenshot 2026-05-24 225409.png`
-- `Screenshot/Screenshot 2026-05-24 225420.png`
-- `Screenshot/Screenshot 2026-05-24 225456.png`
-- `Screenshot/Screenshot 2026-05-24 225612.png`
-- `Screenshot/Screenshot 2026-05-24 225632.png`
-- `Screenshot/Screenshot 2026-05-24 225711.png`
-- `Screenshot/Screenshot 2026-05-24 225731.png`
-- `Screenshot/Screenshot 2026-05-24 225813.png`
-- `Screenshot/Screenshot 2026-05-24 225841.png`
-- `Screenshot/Screenshot 2026-05-24 225919.png`
-- `Screenshot/Screenshot 2026-05-24 225933.png`
-- `Screenshot/Screenshot 2026-05-24 225950.png`
+More screenshots are available in the `Screenshot/` folder.
 
 ## License & Contact
 
