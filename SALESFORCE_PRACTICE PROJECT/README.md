@@ -1,4 +1,4 @@
-# SkyLine Air — Airline Management (Salesforce DX)
+# SkyLine Air — Airline Management System (Salesforce DX)
 
 SkyLine Air is an Airline Management solution built with Salesforce (Salesforce DX + Lightning Web Components). This repository contains LWC components, custom objects, flows and automation used to manage flights, bookings, payments, and related operations.
 
