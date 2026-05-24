@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Base_Fare_not_Chngable</fullName>
+    <active>true</active>
+    <errorConditionFormula>AND(
+    NOT(ISNEW()),
+    ISCHANGED(Base_Fare__c)
+)</errorConditionFormula>
+    <errorDisplayField>Base_Fare__c</errorDisplayField>
+    <errorMessage>This Fare You can&apos;t change</errorMessage>
+</ValidationRule>

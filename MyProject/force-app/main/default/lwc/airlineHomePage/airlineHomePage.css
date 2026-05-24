@@ -1,0 +1,73 @@
+.container {
+    background-color: #1e2f5b;
+    min-height: 100vh;
+    padding: 20px;
+}
+
+/* Navbar */
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: rgb(169, 227, 226);
+    padding: 15px 30px;
+    border-radius: 8px;
+    font-size: 22px;
+}
+
+.logo {
+    font-size: 30px;
+    font-weight: bold;
+    color: #1e2f5b;
+}
+
+.nav-links span {
+    margin: 0 15px;
+    cursor: pointer;
+    font-weight: 500;
+}
+
+.nav-links span:hover {
+    color: #2e6cff;
+}
+
+/* Hero Section */
+.hero {
+    display: flex;
+    margin-top: 20px;
+    background: rgb(238, 192, 225);
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+/* Left */
+.left-section {
+    width: 50%;
+    padding: 50px;
+}
+
+.left-section h1 {
+    font-size: 40px;
+    color: #333;
+}
+
+.left-section span {
+    color: #2e6cff;
+}
+
+.left-section p {
+    margin-top: 15px;
+    color: #666;
+    font-size: 25px;
+}
+
+/* Right */
+.right-section {
+    width: 50%;
+}
+
+.right-section img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}

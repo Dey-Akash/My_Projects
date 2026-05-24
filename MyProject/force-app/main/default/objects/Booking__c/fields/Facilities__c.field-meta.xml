@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Facilities__c</fullName>
+    <label>Facilities</label>
+    <required>false</required>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>MultiselectPicklist</type>
+    <valueSet>
+        <controllingField>Seat_Class__c</controllingField>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>Snacks</fullName>
+                <default>false</default>
+                <label>Snacks</label>
+            </value>
+            <value>
+                <fullName>Water Bottle</fullName>
+                <default>false</default>
+                <label>Water Bottle</label>
+            </value>
+            <value>
+                <fullName>Standard Seat</fullName>
+                <default>false</default>
+                <label>Standard Seat</label>
+            </value>
+            <value>
+                <fullName>Paid WiFi</fullName>
+                <default>false</default>
+                <label>Paid WiFi</label>
+            </value>
+            <value>
+                <fullName>Lounge Access</fullName>
+                <default>false</default>
+                <label>Lounge Access</label>
+            </value>
+            <value>
+                <fullName>Extra Legroom</fullName>
+                <default>false</default>
+                <label>Extra Legroom</label>
+            </value>
+            <value>
+                <fullName>Premium Meals</fullName>
+                <default>false</default>
+                <label>Premium Meals</label>
+            </value>
+            <value>
+                <fullName>Priority Boarding</fullName>
+                <default>false</default>
+                <label>Priority Boarding</label>
+            </value>
+            <value>
+                <fullName>Free WiFi</fullName>
+                <default>false</default>
+                <label>Free WiFi</label>
+            </value>
+            <value>
+                <fullName>Private Suite</fullName>
+                <default>false</default>
+                <label>Private Suite</label>
+            </value>
+            <value>
+                <fullName>Lie-flat Bed</fullName>
+                <default>false</default>
+                <label>Lie-flat Bed</label>
+            </value>
+            <value>
+                <fullName>Luxury Dining</fullName>
+                <default>false</default>
+                <label>Luxury Dining</label>
+            </value>
+            <value>
+                <fullName>Chauffeur Service</fullName>
+                <default>false</default>
+                <label>Chauffeur Service</label>
+            </value>
+            <value>
+                <fullName>Unlimited WiFi</fullName>
+                <default>false</default>
+                <label>Unlimited WiFi</label>
+            </value>
+        </valueSetDefinition>
+        <valueSettings>
+            <controllingFieldValue>Economy</controllingFieldValue>
+            <controllingFieldValue>Premium Economy</controllingFieldValue>
+            <controllingFieldValue>Business</controllingFieldValue>
+            <controllingFieldValue>First Class</controllingFieldValue>
+            <valueName>Snacks</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Economy</controllingFieldValue>
+            <controllingFieldValue>Premium Economy</controllingFieldValue>
+            <controllingFieldValue>Business</controllingFieldValue>
+            <controllingFieldValue>First Class</controllingFieldValue>
+            <valueName>Water Bottle</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Economy</controllingFieldValue>
+            <controllingFieldValue>Premium Economy</controllingFieldValue>
+            <controllingFieldValue>Business</controllingFieldValue>
+            <controllingFieldValue>First Class</controllingFieldValue>
+            <valueName>Standard Seat</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Economy</controllingFieldValue>
+            <controllingFieldValue>Premium Economy</controllingFieldValue>
+            <valueName>Paid WiFi</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Premium Economy</controllingFieldValue>
+            <controllingFieldValue>Business</controllingFieldValue>
+            <controllingFieldValue>First Class</controllingFieldValue>
+            <valueName>Lounge Access</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Business</controllingFieldValue>
+            <controllingFieldValue>First Class</controllingFieldValue>
+            <valueName>Extra Legroom</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Business</controllingFieldValue>
+            <controllingFieldValue>First Class</controllingFieldValue>
+            <valueName>Premium Meals</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Business</controllingFieldValue>
+            <controllingFieldValue>First Class</controllingFieldValue>
+            <valueName>Free WiFi</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>First Class</controllingFieldValue>
+            <valueName>Priority Boarding</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>First Class</controllingFieldValue>
+            <valueName>Private Suite</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>First Class</controllingFieldValue>
+            <valueName>Lie-flat Bed</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>First Class</controllingFieldValue>
+            <valueName>Luxury Dining</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>First Class</controllingFieldValue>
+            <valueName>Chauffeur Service</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>First Class</controllingFieldValue>
+            <valueName>Unlimited WiFi</valueName>
+        </valueSettings>
+    </valueSet>
+    <visibleLines>5</visibleLines>
+</CustomField>

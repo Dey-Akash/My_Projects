@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Prevent_Final_Amount_Edit</fullName>
+    <active>true</active>
+    <errorConditionFormula>AND(
+  ISCHANGED( Final_Paid_Amount__c ),
+  NOT($Profile.Name = &quot;System Administrator&quot;)
+)</errorConditionFormula>
+    <errorDisplayField>Final_Paid_Amount__c</errorDisplayField>
+    <errorMessage>Amount Is Auto Calculated. You Cannot Edit It.</errorMessage>
+</ValidationRule>
