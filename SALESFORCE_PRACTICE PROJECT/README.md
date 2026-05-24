@@ -113,13 +113,63 @@ sfdx force:apex:test:run -u <ORG_ALIAS> --resultformat human --wait 10
 
 The `Screenshot/` folder contains sample UI and workflow images for the Airline Management app.
 
-### View sample screenshots
+### Inline screenshots
 
-![Airline management screenshot 1](Screenshot/Screenshot%202026-05-24%20224543.png)
+![Screenshot 2026-05-24 224543](Screenshot/Screenshot%202026-05-24%20224543.png)
 
-![Airline management screenshot 2](Screenshot/Screenshot%202026-05-24%20225110.png)
+![Screenshot 2026-05-24 225110](Screenshot/Screenshot%202026-05-24%20225110.png)
 
-More screenshots are available in the `Screenshot/` folder.
+![Screenshot 2026-05-24 225122](Screenshot/Screenshot%202026-05-24%20225122.png)
+
+![Screenshot 2026-05-24 225134](Screenshot/Screenshot%202026-05-24%20225134.png)
+
+![Screenshot 2026-05-24 225146](Screenshot/Screenshot%202026-05-24%20225146.png)
+
+![Screenshot 2026-05-24 225203](Screenshot/Screenshot%202026-05-24%20225203.png)
+
+![Screenshot 2026-05-24 225219](Screenshot/Screenshot%202026-05-24%20225219.png)
+
+![Screenshot 2026-05-24 225229](Screenshot/Screenshot%202026-05-24%20225229.png)
+
+![Screenshot 2026-05-24 225239](Screenshot/Screenshot%202026-05-24%20225239.png)
+
+![Screenshot 2026-05-24 225253](Screenshot/Screenshot%202026-05-24%20225253.png)
+
+![Screenshot 2026-05-24 225304](Screenshot/Screenshot%202026-05-24%20225304.png)
+
+![Screenshot 2026-05-24 225315](Screenshot/Screenshot%202026-05-24%20225315.png)
+
+![Screenshot 2026-05-24 225326](Screenshot/Screenshot%202026-05-24%20225326.png)
+
+![Screenshot 2026-05-24 225337](Screenshot/Screenshot%202026-05-24%20225337.png)
+
+![Screenshot 2026-05-24 225348](Screenshot/Screenshot%202026-05-24%20225348.png)
+
+![Screenshot 2026-05-24 225359](Screenshot/Screenshot%202026-05-24%20225359.png)
+
+![Screenshot 2026-05-24 225409](Screenshot/Screenshot%202026-05-24%20225409.png)
+
+![Screenshot 2026-05-24 225420](Screenshot/Screenshot%202026-05-24%20225420.png)
+
+![Screenshot 2026-05-24 225456](Screenshot/Screenshot%202026-05-24%20225456.png)
+
+![Screenshot 2026-05-24 225612](Screenshot/Screenshot%202026-05-24%20225612.png)
+
+![Screenshot 2026-05-24 225632](Screenshot/Screenshot%202026-05-24%20225632.png)
+
+![Screenshot 2026-05-24 225711](Screenshot/Screenshot%202026-05-24%20225711.png)
+
+![Screenshot 2026-05-24 225731](Screenshot/Screenshot%202026-05-24%20225731.png)
+
+![Screenshot 2026-05-24 225813](Screenshot/Screenshot%202026-05-24%20225813.png)
+
+![Screenshot 2026-05-24 225841](Screenshot/Screenshot%202026-05-24%20225841.png)
+
+![Screenshot 2026-05-24 225919](Screenshot/Screenshot%202026-05-24%20225919.png)
+
+![Screenshot 2026-05-24 225933](Screenshot/Screenshot%202026-05-24%20225933.png)
+
+![Screenshot 2026-05-24 225950](Screenshot/Screenshot%202026-05-24%20225950.png)
 
 ## License & Contact
 
