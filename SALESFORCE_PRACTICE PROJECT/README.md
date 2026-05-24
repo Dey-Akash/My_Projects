@@ -1,18 +1,124 @@
-# Salesforce DX Project: Next Steps
+# SkyLine Air — Airline Management (Salesforce DX)
 
-Now that you’ve created a Salesforce DX project, what’s next? Here are some documentation resources to get you started.
+SkyLine Air is an Airline Management solution built with Salesforce (Salesforce DX + Lightning Web Components). This repository contains LWC components, custom objects, flows and automation used to manage flights, bookings, payments, and related operations.
 
-## How Do You Plan to Deploy Your Changes?
+**Project status:** Development
 
-Do you want to deploy a set of changes, or create a self-contained application? Choose a [development model](https://developer.salesforce.com/tools/vscode/en/user-guide/development-models).
+**Key locations:**
+- **Source:** force-app/main/default
+- **LWC components:** force-app/main/default/lwc
+- **Custom objects & fields:** force-app/main/default/objects
 
-## Configure Your Salesforce DX Project
+## Contents
 
-The `sfdx-project.json` file contains useful configuration information for your project. See [Salesforce DX Project Configuration](https://developer.salesforce.com/docs/atlas.en-us.sfdx_dev.meta/sfdx_dev/sfdx_dev_ws_config.htm) in the _Salesforce DX Developer Guide_ for details about this file.
+- Overview
+- Features
+- Tech stack
+- Prerequisites
+- Local setup
+- Deploying to an org
+- Metadata & data notes
+- Contributing
+- Troubleshooting
 
-## Read All About It
+## Overview
 
-- [Salesforce Extensions Documentation](https://developer.salesforce.com/tools/vscode/)
-- [Salesforce CLI Setup Guide](https://developer.salesforce.com/docs/atlas.en-us.sfdx_setup.meta/sfdx_setup/sfdx_setup_intro.htm)
-- [Salesforce DX Developer Guide](https://developer.salesforce.com/docs/atlas.en-us.sfdx_dev.meta/sfdx_dev/sfdx_dev_intro.htm)
-- [Salesforce CLI Command Reference](https://developer.salesforce.com/docs/atlas.en-us.sfdx_cli_reference.meta/sfdx_cli_reference/cli_reference.htm)
+SkyLine Air provides a lightweight airline operations suite implemented on Salesforce. It includes:
+
+- Flight management (`Flight__c` object and related fields)
+- Booking and payment flows
+- LWC pages for an airline home/dashboard
+- Automation for fare calculation and payment updates
+
+## Features
+
+- Manage flights, schedules and airlines
+- Calculate total fare and update payment records using Flows
+- LWC-based UI for booking and admin screens
+- Apex triggers and helper classes for business logic
+
+## Tech stack
+
+- Salesforce Platform (Salesforce DX)
+- Lightning Web Components (LWC)
+- Apex (server-side logic)
+- Flows (no-code automation)
+
+## Prerequisites
+
+- Node.js (for local tools, optional)
+- Salesforce CLI (`sfdx`) — https://developer.salesforce.com/tools/sfdxcli
+- An authenticated Dev Hub or scratch org (for DX workflows)
+
+## Local setup
+
+1. Install Salesforce CLI and authenticate:
+
+```bash
+# install/verify sfdx per platform
+sfdx --version
+# authenticate to an org (web-based)
+sfdx auth:web:login -d -a DevHub
+```
+
+2. Push source to a scratch org (example):
+
+```bash
+# create a scratch org
+sfdx force:org:create -s -f config/project-scratch-def.json -a AirlineDev
+# push source and open
+sfdx force:source:push
+sfdx force:org:open
+```
+
+3. Retrieve or deploy to a non-scratch org:
+
+```bash
+# deploy to a sandbox or production (use caution)
+sfdx force:source:deploy -p force-app/main/default -u <TARGET_ORG_ALIAS>
+```
+
+## Metadata & important files
+
+- `force-app/main/default/lwc/airlineHomePage` — main LWC UI for the airline home page
+- `force-app/main/default/objects/Flight__c` — custom object and fields (e.g., Airline_Name__c)
+- `force-app/main/default/flows` — flows for fare calculation and payment updates
+- `sfdx-project.json` — project configuration
+
+## Running tests
+
+- Apex tests:
+
+```bash
+sfdx force:apex:test:run -u <ORG_ALIAS> --resultformat human --wait 10
+```
+
+## Troubleshooting
+
+- If LWC static resources don’t load, check that `staticresources` are deployed and referenced names match.
+- For flow issues, validate the flow in the org and check the flow interview logs.
+- Check Apex debug logs in the target org for trigger and class failures.
+
+## Contributing
+
+- Fork, create a feature branch, and open a pull request describing changes.
+- Add tests for Apex logic where applicable.
+
+## Deployment checklist
+
+- Ensure fields and objects are included in changesets or source deploy paths.
+- Run Apex tests after deployment.
+
+## License & Contact
+
+- License: Add your preferred license here (e.g., MIT)
+- Maintainer: Add your name and contact information
+
+---
+
+If you'd like, I can:
+- Add badges (build / tests)
+- Add sample data insertion scripts
+- Add a short contributor guide with SFDX examples
+
+See the project README: [SALESFORCE_PRACTICE PROJECT/README.md](SALESFORCE_PRACTICE PROJECT/README.md)
