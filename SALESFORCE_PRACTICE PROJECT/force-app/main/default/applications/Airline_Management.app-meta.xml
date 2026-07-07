@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomApplication xmlns="http://soap.sforce.com/2006/04/metadata">
+    <brand>
+        <headerColor>#0070D2</headerColor>
+        <logo>download</logo>
+        <logoVersion>1</logoVersion>
+        <shouldOverrideOrgTheme>false</shouldOverrideOrgTheme>
+    </brand>
+    <description>To see Airline App Solution</description>
+    <formFactors>Small</formFactors>
+    <formFactors>Large</formFactors>
+    <isNavAutoTempTabsDisabled>false</isNavAutoTempTabsDisabled>
+    <isNavPersonalizationDisabled>false</isNavPersonalizationDisabled>
+    <isNavTabPersistenceDisabled>false</isNavTabPersistenceDisabled>
+    <isOmniPinnedViewEnabled>false</isOmniPinnedViewEnabled>
+    <label>Airline Management</label>
+    <navType>Standard</navType>
+    <tabs>Airline_Home_Page</tabs>
+    <tabs>Airport__c</tabs>
+    <tabs>Flight__c</tabs>
+    <tabs>Passenger_Details__c</tabs>
+    <tabs>Booking__c</tabs>
+    <tabs>Ticket__c</tabs>
+    <tabs>Crew_Member__c</tabs>
+    <tabs>Baggage__c</tabs>
+    <tabs>Payment__c</tabs>
+    <tabs>Case_Support__c</tabs>
+    <tabs>AFS</tabs>
+    <tabs>Rating_And_Feedback__c</tabs>
+    <tabs>standard-report</tabs>
+    <tabs>standard-Dashboard</tabs>
+    <uiType>Lightning</uiType>
+    <utilityBar>Indigo_Airline_Management_UtilityBar</utilityBar>
+</CustomApplication>
