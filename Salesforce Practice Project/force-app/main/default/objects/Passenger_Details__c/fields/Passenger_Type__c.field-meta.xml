@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Passenger_Type__c</fullName>
+    <label>Passenger Type</label>
+    <required>false</required>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>Regular</fullName>
+                <default>true</default>
+                <label>Regular</label>
+            </value>
+            <value>
+                <fullName>Vip</fullName>
+                <default>false</default>
+                <label>Vip</label>
+            </value>
+            <value>
+                <fullName>Senior Citizen</fullName>
+                <default>false</default>
+                <label>Senior Citizen</label>
+            </value>
+            <value>
+                <fullName>Child</fullName>
+                <default>false</default>
+                <label>Child</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

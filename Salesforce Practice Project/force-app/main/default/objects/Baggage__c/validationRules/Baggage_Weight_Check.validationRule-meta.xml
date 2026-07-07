@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Baggage_Weight_Check</fullName>
+    <active>true</active>
+    <description>weight cannot be negative</description>
+    <errorConditionFormula>Baggage_Weight__c &lt; 0</errorConditionFormula>
+    <errorDisplayField>Baggage_Weight__c</errorDisplayField>
+    <errorMessage>Baggage weight cannot be negative.</errorMessage>
+</ValidationRule>
