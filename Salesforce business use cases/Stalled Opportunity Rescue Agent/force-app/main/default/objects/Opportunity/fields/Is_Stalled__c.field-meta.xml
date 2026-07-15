@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Is_Stalled__c</fullName>
+    <defaultValue>false</defaultValue>
+    <description>Set to true by the scheduled flow when no activity in 14 days on an open opportunity</description>
+    <label>Is Stalled</label>
+    <trackFeedHistory>false</trackFeedHistory>
+    <trackTrending>false</trackTrending>
+    <type>Checkbox</type>
+</CustomField>
