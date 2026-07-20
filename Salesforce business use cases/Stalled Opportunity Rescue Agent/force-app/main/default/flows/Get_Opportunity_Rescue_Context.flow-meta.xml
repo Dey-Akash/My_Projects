@@ -1,0 +1,213 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Flow xmlns="http://soap.sforce.com/2006/04/metadata">
+    <apiVersion>67.0</apiVersion>
+    <areMetricsLoggedToDataCloud>false</areMetricsLoggedToDataCloud>
+    <assignments>
+        <name>Append_Task_to_Summary</name>
+        <label>Append Task to Summary</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <assignmentItems>
+            <assignToReference>taskSummary</assignToReference>
+            <operator>Add</operator>
+            <value>
+                <stringValue>&apos;\n- &apos; + {!Loop_Recent_Tasks.ActivityDate} + &apos; [&apos; + {!Loop_Recent_Tasks.Status} + &apos;] &apos; + {!Loop_Recent_Tasks.Subject}</stringValue>
+            </value>
+        </assignmentItems>
+        <connector>
+            <targetReference>Loop_Recent_Tasks</targetReference>
+        </connector>
+    </assignments>
+    <assignments>
+        <name>Build_Final_Context</name>
+        <label>Build Final Context</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <assignmentItems>
+            <assignToReference>outputContext</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <elementReference>contextText</elementReference>
+            </value>
+        </assignmentItems>
+    </assignments>
+    <assignments>
+        <name>Build_Task_Summary</name>
+        <label>Build Task Summary</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <assignmentItems>
+            <assignToReference>taskSummary</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <stringValue>(none)</stringValue>
+            </value>
+        </assignmentItems>
+        <connector>
+            <targetReference>Are_there_tasks</targetReference>
+        </connector>
+    </assignments>
+    <decisions>
+        <name>Are_there_tasks</name>
+        <label>Are there tasks?</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <defaultConnectorLabel>Yes has no tasks</defaultConnectorLabel>
+        <rules>
+            <name>Yes</name>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>Get_Recent_Tasks</leftValueReference>
+                <operator>IsNull</operator>
+                <rightValue>
+                    <booleanValue>false</booleanValue>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>Loop_Recent_Tasks</targetReference>
+            </connector>
+            <label>Yes</label>
+        </rules>
+    </decisions>
+    <description>Reads an Opportunity and its recent Tasks, returns a text summary for the Rescue Agent.</description>
+    <environments>Default</environments>
+    <formulas>
+        <name>contextText</name>
+        <dataType>String</dataType>
+        <expression>&apos;Opportunity: &apos; + {!Get_Opportunity_Details.Name}
++ &apos; | Account: &apos; + {!Get_Opportunity_Details.Account.Name}
++ &apos; | Industry: &apos; + TEXT({!Get_Opportunity_Details.Account.Industry})
++ &apos; | Stage: &apos; + TEXT({!Get_Opportunity_Details.StageName})
++ &apos; | Amount: &apos; + TEXT({!Get_Opportunity_Details.Amount})
++ &apos; | Close date: &apos; + TEXT({!Get_Opportunity_Details.CloseDate})
++ &apos; | Last activity: &apos; + TEXT({!Get_Opportunity_Details.LastActivityDate})
++ &apos; | Stalled since: &apos; + TEXT({!Get_Opportunity_Details.Stalled_Since__c})
++ &apos; | Stall reason: &apos; + {!Get_Opportunity_Details.Stall_Reason__c}
++ &apos; | Recent activities: &apos; + {!taskSummary}</expression>
+    </formulas>
+    <interviewLabel>Get Opportunity Rescue Context {!$Flow.CurrentDateTime}</interviewLabel>
+    <label>Get Opportunity Rescue Context</label>
+    <loops>
+        <name>Loop_Recent_Tasks</name>
+        <label>Loop Recent Tasks</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <collectionReference>Get_Recent_Tasks</collectionReference>
+        <iterationOrder>Asc</iterationOrder>
+        <nextValueConnector>
+            <targetReference>Append_Task_to_Summary</targetReference>
+        </nextValueConnector>
+        <noMoreValuesConnector>
+            <targetReference>Build_Final_Context</targetReference>
+        </noMoreValuesConnector>
+    </loops>
+    <processMetadataValues>
+        <name>BuilderType</name>
+        <value>
+            <stringValue>LightningFlowBuilder</stringValue>
+        </value>
+    </processMetadataValues>
+    <processMetadataValues>
+        <name>CanvasMode</name>
+        <value>
+            <stringValue>AUTO_LAYOUT_CANVAS</stringValue>
+        </value>
+    </processMetadataValues>
+    <processMetadataValues>
+        <name>OriginBuilderType</name>
+        <value>
+            <stringValue>LightningFlowBuilder</stringValue>
+        </value>
+    </processMetadataValues>
+    <processType>AutoLaunchedFlow</processType>
+    <recordLookups>
+        <name>Get_Opportunity_Details</name>
+        <label>Get Opportunity Details</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <assignNullValuesIfNoRecordsFound>false</assignNullValuesIfNoRecordsFound>
+        <connector>
+            <targetReference>Get_Recent_Tasks</targetReference>
+        </connector>
+        <filterLogic>and</filterLogic>
+        <filters>
+            <field>Id</field>
+            <operator>EqualTo</operator>
+            <value>
+                <elementReference>inputOpportunityId</elementReference>
+            </value>
+        </filters>
+        <getFirstRecordOnly>true</getFirstRecordOnly>
+        <object>Opportunity</object>
+        <queriedFields>Id</queriedFields>
+        <queriedFields>Name</queriedFields>
+        <queriedFields>StageName</queriedFields>
+        <queriedFields>Amount</queriedFields>
+        <queriedFields>CloseDate</queriedFields>
+        <queriedFields>LastActivityDate</queriedFields>
+        <queriedFields>Is_Stalled__c</queriedFields>
+        <queriedFields>Stalled_Since__c</queriedFields>
+        <queriedFields>Stall_Reason__c</queriedFields>
+        <queriedFields>AccountId</queriedFields>
+        <queriedFields>OwnerId</queriedFields>
+        <storeOutputAutomatically>true</storeOutputAutomatically>
+    </recordLookups>
+    <recordLookups>
+        <name>Get_Recent_Tasks</name>
+        <label>Get Recent Tasks</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <assignNullValuesIfNoRecordsFound>false</assignNullValuesIfNoRecordsFound>
+        <connector>
+            <targetReference>Build_Task_Summary</targetReference>
+        </connector>
+        <filterLogic>and</filterLogic>
+        <filters>
+            <field>WhatId</field>
+            <operator>EqualTo</operator>
+            <value>
+                <elementReference>inputOpportunityId</elementReference>
+            </value>
+        </filters>
+        <getFirstRecordOnly>false</getFirstRecordOnly>
+        <object>Task</object>
+        <queriedFields>Id</queriedFields>
+        <queriedFields>Subject</queriedFields>
+        <queriedFields>ActivityDate</queriedFields>
+        <queriedFields>Status</queriedFields>
+        <sortField>ActivityDate</sortField>
+        <sortOrder>Desc</sortOrder>
+        <storeOutputAutomatically>true</storeOutputAutomatically>
+    </recordLookups>
+    <start>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <connector>
+            <targetReference>Get_Opportunity_Details</targetReference>
+        </connector>
+    </start>
+    <status>Active</status>
+    <variables>
+        <description>The Id of the Opportunity to get rescue context for.</description>
+        <name>inputOpportunityId</name>
+        <dataType>String</dataType>
+        <isCollection>false</isCollection>
+        <isInput>true</isInput>
+        <isOutput>false</isOutput>
+    </variables>
+    <variables>
+        <description>Multi-line text summary of the Opportunity: name, account, stage, amount, close date, days since last activity, stall date, and recent activities. Used by the agent to reason about next steps.</description>
+        <name>outputContext</name>
+        <dataType>String</dataType>
+        <isCollection>false</isCollection>
+        <isInput>false</isInput>
+        <isOutput>true</isOutput>
+    </variables>
+    <variables>
+        <name>taskSummary</name>
+        <dataType>String</dataType>
+        <isCollection>false</isCollection>
+        <isInput>false</isInput>
+        <isOutput>false</isOutput>
+    </variables>
+</Flow>
